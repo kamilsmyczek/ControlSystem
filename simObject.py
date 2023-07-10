@@ -16,6 +16,8 @@ beta = [0.01, 0.007]
 
 t_end = 600
 
+ADD_NOISE = False
+
 T_ambient = 20
 T_heater = [T_ambient]
 T_water = [1.3 * T_ambient]
@@ -35,7 +37,10 @@ def nextWaterTemp(t):
     T_next = T_water[-1] + dT * dt
     return T_next
 
-def getRand(maxVal, minVal):
+def getNoise(maxVal, minVal):
+    if not ADD_NOISE:
+        return 0
+    
     r = random.random()
     return r * (maxVal - minVal) + minVal
 
@@ -50,10 +55,10 @@ for t in time:
         ctrl = control[idxCtrl][1]
         idxCtrl += 1
     
-    T_heater.append(nextHeaterTemp(t, ctrl) + getRand(.1, -.1))
-    T_water.append(nextWaterTemp(t) + getRand(.1, -.1))
+    T_heater.append(nextHeaterTemp(t, ctrl) + getNoise(.1, -.1))
+    T_water.append(nextWaterTemp(t) + getNoise(.1, -.1))
     power.append(ctrl)
-    timeNoise.append(t + getRand(dt * 0.4, -dt * 0.4))
+    timeNoise.append(t + getNoise(dt * 0.4, -dt * 0.4))
 size = len(time)
 T_heater = T_heater[:size]
 T_water = T_water[:size]
