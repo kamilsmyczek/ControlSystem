@@ -46,13 +46,13 @@ class PID:
         err = ref - act
 
         self.Iterm += err * self.K[1] * self.dt;
-        """if self.Iterm > self.maxOut[1]:
+        if self.Iterm > self.maxOut[1]:
             self.Iterm = self.maxOut[1]
-            print('PRzekracz maks')
+            #print('Przekroczony maks')
         elif self.Iterm < self.maxOut[0]:
             self.Iterm = self.maxOut[0]
-            #print('PRzekracz min')
-        """
+            #print('Przekroczony min')
+            
         errDiff = (err - self.lastErr) / self.dt
         
         out = err * self.K[0] + self.Iterm + errDiff * self.K[2]
