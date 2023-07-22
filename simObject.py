@@ -26,6 +26,8 @@ dt = 0.2
 control = [(0, 0), (200, 10), (300, 0), (999999, 0)]
 
 random.seed(time.time())
+
+
 def nextHeaterTemp(t, p):
     dT = p * alpha[0] - (T_heater[-1] - T_water[-1]) *  alpha[1] 
     T_next = T_heater[-1] + dT * dt
@@ -78,4 +80,10 @@ df = pd.DataFrame(dataset)
 # saving the dataframe
 df.to_csv('GFG.csv')
 
-
+#
+from control.matlab import *
+# System matrices
+A = [[0, 1.], [-k/m, -b/m]]
+B = [[0], [1/m]]
+C = [[1., 0]]
+sys = ss(A, B, C, 0)
