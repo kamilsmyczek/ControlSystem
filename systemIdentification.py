@@ -47,6 +47,7 @@ T_end = Obj_t.max(0)
 dt = 0.001
 t = np.arange(T_end, step=dt)
 u_t = createControlVector(t, Obj_t, Obj_u)
+u_t2 = list(zip(u_t, [23] * len(u_t)))
 x0 = [20]
 
 def interpolateData(t, v):
@@ -54,35 +55,40 @@ def interpolateData(t, v):
     f_t = scipy.interpolate.CubicSpline(x, y)
     return [f_t(_t) for _t in t]
 
-def createSystem(alpha):
+def createSystem(a):
     # System matrices
-    A = [-1 / (alpha[0])]
-    B = [1 / (alpha[0])]
-    C = [1.]
-    
-    
-    sys = ss(A, B, C, 0)
-    return sys
+    A = [[-a[1], a[1]], [a[2], -a[2] - a[3]]]
+    B = [[a[0], 0], [0, a[3]]]
+    C = [[0, 1]]
+    D = 0
+      
+    return ss(A, B, C, D)
 
-
+x0 = [[23], [23]]
 def Quality(alpha):
-    yout, T, xout = lsim(createSystem(alpha), U=u_t, T=t, X0=x0)
+    yout, T, xout = lsim(createSystem(alpha), U=u_t2, T=t, X0=x0)
     Sim_y = interpolateData(Obj_t, zip(T, yout))
         
     q = 0
     for v in zip(Sim_y, Obj_y):
         q += abs(v[0]- v[1])
-
+    print(q)
     return q
-        
-exit()
-optAlpha = scipy.optimize.fmin(func=Quality, x0=[-1.2,1])
+
+plt.close()
+plt.figure(1)
+plt.plot(Obj_t, Obj_y, Obj_t, Obj_u)
+plt.legend(['Sim best', 'Object'])
+plt.grid()
+plt.show()    
+a0 = [0.21, 0.035, 0.21, 0.0001]   
+optAlpha = scipy.optimize.fmin(func=Quality, x0=a0)
 print('Optimum value:', optAlpha)
 
 optSys = createSystem(optAlpha)
-yout, T, xout = lsim(createSystem(optSys), U=u_t, T=t, X0=x0)
+yout, T, xout = lsim(createSystem(optSys), U=u_t2, T=t, X0=x0)
 plt.figure(1)
 plt.plot(T, yout, Obj_t, Obj_y, '.')
 plt.legend(['Sim best', 'Object'])
 plt.grid()
-plt.show()
+plt.show()+
